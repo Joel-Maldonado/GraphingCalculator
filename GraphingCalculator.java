@@ -24,6 +24,8 @@ public class GraphingCalculator extends JComponent {
         frame.setLocationRelativeTo(null);
         frame.add(shapes);
         frame.setVisible(true);
+
+        kb.close();
     }
 
     public void paint(Graphics g) {
