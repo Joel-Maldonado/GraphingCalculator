@@ -34,8 +34,10 @@ public class GraphingCalculator extends JComponent {
 
         // Draw Grid
         g.setColor(new Color(0, 0, 0, 100));
-        g.drawLine(xOffset, 0, xOffset, getHeight());
-        g.drawLine(0, yOffset, getWidth(), yOffset);
+
+        // Dark Center lines
+        g.drawLine(xOffset, 0, xOffset, getHeight()); // Vertical x = 0
+        g.drawLine(0, yOffset, getWidth(), yOffset); // Horizontal y = 0
 
         // Vertical
         g.setColor(new Color(0, 0, 0, 30));
@@ -50,6 +52,18 @@ public class GraphingCalculator extends JComponent {
             g.drawLine(0, -y * units + yOffset, getWidth(), -y * units + yOffset);
         }
 
+        // Draw coord labels
+        g.setColor(Color.black);
+        for (int y = 0; y <= getHeight() / units / 2; y++) { // Vertical
+            g.drawString(String.valueOf(-y), xOffset, y * units + yOffset + units/2); // Pos
+            g.drawString(String.valueOf(y), xOffset, -y * units + yOffset + units/2); // Neg
+        }
+
+        for (int x = 0; x <= getWidth() / units / 2; x++) { // Horizontal
+            g.drawString(String.valueOf(-x), -x * units + xOffset, yOffset + units/2); // Pos
+            g.drawString(String.valueOf(x), x * units + xOffset, yOffset + units/2); // Neg
+        }
+
         // Plot Points
         g.setColor(new Color(0, 0, 255));
         for (int x = min; x <= max; x++) {
@@ -58,6 +72,6 @@ public class GraphingCalculator extends JComponent {
     }
 
     public static int f(int x) {
-        return x;
+        return 5;
     }
 }
