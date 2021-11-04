@@ -1,12 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class GraphingCalculator extends JComponent {
     static int height = 800;
     static int width = 800;
     static int units = 25;
     static int plotPointSize = units / 5;
+    static double graphLineFrequency = 0.001; // 1 is a normal plot point
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Graphing Calculator");
@@ -23,30 +23,32 @@ public class GraphingCalculator extends JComponent {
         width = getWidth();
         height = getHeight();
 
-        int min = -width / units / 2 - 2;
-        int max = width / units / 2 + 2;
+        int min = -width / units / 2 - 1;
+        int max = width / units / 2 + 1;
         
         int xOffset = width / 2;
         int yOffset = height / 2;
         
         // Draw Grid
-        g.setColor(new Color(0, 0, 0, 100));
+        g.setColor(Color.black);
 
         // Dark Center lines
         g.drawLine(xOffset, 0, xOffset, height); // Vertical x = 0
         g.drawLine(0, yOffset, width, yOffset); // Horizontal y = 0
+        
+        // Rest of grid
+        g.setColor(new Color(0, 0, 0, 30));
 
         // Vertical
-        g.setColor(new Color(0, 0, 0, 30));
         for (int x = 0; x * units + xOffset < width; x++) {
-            g.drawLine(x * units + xOffset, 0, x * units + xOffset, height); // Pos
-            g.drawLine(-x * units + xOffset, 0, -x * units + xOffset, height); // Neg
+            g.drawLine(convertToGraphUnitsX(x), 0, convertToGraphUnitsX(x), height); // Pos
+            g.drawLine(convertToGraphUnitsX(-x), 0, convertToGraphUnitsX(-x), height); // Neg
         }
         
         // Horizontal
-        for (int y = 0; y * units + yOffset < height; y++) {
-            g.drawLine(0, y * units + yOffset, width, y * units + yOffset);
-            g.drawLine(0, -y * units + yOffset, width, -y * units + yOffset);
+        for (int y = 0; convertToGraphUnitsY(-y) < height; y++) {
+            g.drawLine(0, convertToGraphUnitsY(y), width, convertToGraphUnitsY(y));
+            g.drawLine(0, convertToGraphUnitsY(-y), width, convertToGraphUnitsY(-y));
         }
 
         // Draw coord labels
@@ -60,21 +62,28 @@ public class GraphingCalculator extends JComponent {
             g.drawString(String.valueOf(-x / units), -x + xOffset, yOffset + units/2); // Pos
             g.drawString(String.valueOf(x / units), x + xOffset, yOffset + units/2); // Neg
         }
-
-        g.setColor(Color.blue);
         
-        // Plot Points
+        // Plot points
+        g.setColor(Color.blue);
         for (int x = min; x <= max; x++) {
-            g.fillRect(x * units + xOffset - plotPointSize/2, (int)Math.round(-f(x) * units) + yOffset - plotPointSize/2, plotPointSize, plotPointSize);
+            g.fillRect(convertToGraphUnitsX(x) - plotPointSize/2, convertToGraphUnitsY(f(x)) - plotPointSize/2, plotPointSize, plotPointSize);
         }
 
         // Draw graph line
-        for (int x = min; x <= max * units; x++) {
-            g.drawLine(x * units + xOffset, (int)Math.round(-f(x) * units) + yOffset, units * (x + 1) + xOffset, (int)Math.round(-f(x+1) * units) + yOffset);
+        for (double x = min; x <= max; x += graphLineFrequency) {
+            g.drawLine(convertToGraphUnitsX(x), convertToGraphUnitsY(f(x)), convertToGraphUnitsX(x + graphLineFrequency), convertToGraphUnitsY(f(x+graphLineFrequency)));
         }
     }
 
+    public static int convertToGraphUnitsX(double xCoord) {
+        return (int)(Math.round(xCoord * units + width / 2.0));
+    }
+
+    public static int convertToGraphUnitsY(double yCoord) {
+        return (int)(Math.round(-yCoord * units + height / 2.0));
+    }
+
     public static double f(double x) {
-        return (x * x) * (1.0/2.0 * x) - 5;
+        return Math.sin(x);
     }
 }
