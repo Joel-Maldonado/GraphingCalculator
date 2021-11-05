@@ -5,11 +5,11 @@ import java.awt.event.*;
 public class GraphingCalculator extends JComponent implements KeyListener {
     static int height = 800;
     static int width = 800;
-    static int units = 30;
+    static int units = 25;
     static int plotPointSize;
-    static int min;
-    static int max;
     static char key;
+    static int xCenterOffset;
+    static int yCenterOffset;
     static double graphLineFrequency = 0.01; // 0.01 = 100 lines per point
 
     public static void main(String[] args) {
@@ -29,9 +29,6 @@ public class GraphingCalculator extends JComponent implements KeyListener {
         height = getHeight();
 
         plotPointSize = units / 6;
-
-        min = -Math.max(width, height) / units;
-        max = Math.max(width, height) / units;
         
         int xOffset = width / 2;
         int yOffset = height / 2;
@@ -40,23 +37,18 @@ public class GraphingCalculator extends JComponent implements KeyListener {
         g.setColor(Color.black);
 
         // Dark Center lines
-        g.drawLine(xOffset, 0, xOffset, height); // Vertical x = 0
-        g.drawLine(0, yOffset, width, yOffset); // Horizontal y = 0
+        g.drawLine(0, yOffset + yCenterOffset, width, yOffset + yCenterOffset); // Horizontal black center line
+        g.drawLine(xOffset + xCenterOffset, 0 , xOffset + xCenterOffset, height); // Vertical black center line
         
         // Rest of grid
         g.setColor(new Color(0, 0, 0, 30));
 
-        // Vertical
+        // Vertical gray lines
         for (int x = -xOffset; convertToGraphUnitsX(x) < width; x++) {
-            g.drawLine(convertToGraphUnitsX(x), 0, convertToGraphUnitsX(x), height);
+            g.drawLine(x * units + xOffset, 0, x * units + xOffset, height);
         }
         
-        // Horizontal
-        for (int y = 0; convertToGraphUnitsY(-y) < height; y++) {
-            g.drawLine(0, convertToGraphUnitsY(y), width, convertToGraphUnitsY(y));
-            g.drawLine(0, convertToGraphUnitsY(-y), width, convertToGraphUnitsY(-y));
-        }
-
+        // Horizontal gray lines
         for (int y = -yOffset; convertToGraphUnitsY(-y) < height; y++) {
             g.drawLine(0, convertToGraphUnitsY(y), width, convertToGraphUnitsY(y));
         }
@@ -65,19 +57,18 @@ public class GraphingCalculator extends JComponent implements KeyListener {
         g.setColor(Color.black);
         g.setFont(g.getFont().deriveFont(units/2.2f));
 
-        // Horizontal
-        for (int x = units; x < width/2 + units; x += units) {
-            g.drawString("" + x/units, x + width/2, yOffset); // Pos
-            g.drawString("" + -x/units, -x + width/2, yOffset); // Neg
+        // Horizontal coord labels
+        for (int x = -xOffset; x <= xOffset; x += units) {
+            // Vertical line will have 0th value to stop overlap
+            if (Math.round((double) (x - xCenterOffset)/units) == 0) continue;
+            System.out.println(units);
+            g.drawString("" + Math.round((double)(x - xCenterOffset)/ units), x + xOffset, yOffset + yCenterOffset); 
         }
 
-        // Vertical
-        for (int y = 0; y < height/2; y += units) {
-            g.drawString("" + -y/units, xOffset, y + height/2); // Pos
-            g.drawString("" + y/units, xOffset, -y + height/2); // Neg
+        // Vertical coord labels
+        for (int y = -yOffset; y < height; y += units) {
+            g.drawString("" + Math.round(-(double)(y - yCenterOffset)/ units), xOffset + xCenterOffset, y + yOffset - units/3);
         }
-
-        g.setFont(g.getFont().deriveFont(12f));
         
         // Plot points
         for (int x = -xOffset; x <= xOffset; x++) {
@@ -91,8 +82,8 @@ public class GraphingCalculator extends JComponent implements KeyListener {
             plotPoint(g, x, g(x));
         }
 
-        // Draw graph line
-        for (double x = min; x <= max; x += graphLineFrequency) {
+        // Draw graph lines
+        for (double x = -xOffset; x <= xOffset; x += graphLineFrequency) {
             g.setColor(Color.blue);
             plotLines(g, x, f(x), f(x+graphLineFrequency));
 
@@ -113,15 +104,15 @@ public class GraphingCalculator extends JComponent implements KeyListener {
     }
 
     public static void plotPoint(Graphics g, double x, double fx) {
-        g.fillRect(convertToGraphUnitsX(x) - plotPointSize/2, convertToGraphUnitsY(fx) - plotPointSize/2, plotPointSize, plotPointSize);
+        g.fillRect(convertToGraphUnitsX(x) + xCenterOffset - plotPointSize/2, convertToGraphUnitsY(fx) + yCenterOffset - plotPointSize/2, plotPointSize, plotPointSize);
     }
 
     public static void plotLines(Graphics g, double x, double fx, double fXGraphlinefreq) {
-        g.drawLine(convertToGraphUnitsX(x), convertToGraphUnitsY(fx), convertToGraphUnitsX(x + graphLineFrequency), convertToGraphUnitsY(fXGraphlinefreq));
+        g.drawLine(convertToGraphUnitsX(x) + xCenterOffset, convertToGraphUnitsY(fx) + yCenterOffset, convertToGraphUnitsX(x + graphLineFrequency) + xCenterOffset, convertToGraphUnitsY(fXGraphlinefreq) + yCenterOffset);
     }
 
     public static double f(double x) {
-        return x;
+        return 5;
     }
 
     public static double h(double x) {
@@ -137,12 +128,30 @@ public class GraphingCalculator extends JComponent implements KeyListener {
     public void keyTyped(KeyEvent e) {
         key = e.getKeyChar();
         if (key == '+') {
-            units += 1;
+            units += 4;
+            xCenterOffset = 0;
+            yCenterOffset = 0;
             System.out.println("Zoom in");
         }
-        if (key == '-' && units - 1 > 5) {
-            units -= 1;
+        if (key == '-' && units >= 6) {
+            units -= 4;
+            xCenterOffset = 0;
+            yCenterOffset = 0;
             System.out.println("Zoom out");
+        }
+        if (key == 'd') {
+            System.out.println("right");
+            xCenterOffset -= units;
+        }
+        if (key == 'a') {
+            System.out.println("left");
+            xCenterOffset += units;
+        }
+        if (key == 'w') {
+            yCenterOffset += units;
+        }
+        if (key == 's') {
+            yCenterOffset -= units;
         }
         repaint();
     }
