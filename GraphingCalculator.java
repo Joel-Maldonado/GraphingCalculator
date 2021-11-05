@@ -10,7 +10,7 @@ public class GraphingCalculator extends JComponent implements KeyListener {
     static int min;
     static int max;
     static char key;
-    static double graphLineFrequency = 0.01; // 0-1, 1 is 1 line per plot point
+    static double graphLineFrequency = 0.01; // 0.01 = 100 lines per point
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Graphing Calculator");
@@ -116,7 +116,7 @@ public class GraphingCalculator extends JComponent implements KeyListener {
         g.fillRect(convertToGraphUnitsX(x) - plotPointSize/2, convertToGraphUnitsY(fx) - plotPointSize/2, plotPointSize, plotPointSize);
     }
 
-    public static void plotLines(Graphics g, double x, double fx, double fXGraphlinefreq) { // f(x+graphLineFrequency)
+    public static void plotLines(Graphics g, double x, double fx, double fXGraphlinefreq) {
         g.drawLine(convertToGraphUnitsX(x), convertToGraphUnitsY(fx), convertToGraphUnitsX(x + graphLineFrequency), convertToGraphUnitsY(fXGraphlinefreq));
     }
 
