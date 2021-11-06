@@ -24,15 +24,15 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class GraphingCalculator extends JComponent implements KeyListener, MouseMotionListener {
-    static final double graphLineFrequency = 0.01; // 0.01 = 100 lines between each point
     static int height = 800;
     static int width = 800;
     static int units = Math.round(width/20.5f);
-    static int xOffset;
-    static int yOffset;
+    static double graphLineFrequency = (double)0.4/units; // 0-1 percentage split of each line between each point
+    static int xOffset; // Window 0 for x coords
+    static int yOffset; // Window 0 for y coords
     static int plotPointSize;
-    static int xCenterOffset;
-    static int yCenterOffset;
+    static int xCenterOffset; // Graph shift left to right
+    static int yCenterOffset; // Graph shift up to down
     static int mousePosX;
     static int mousePosY;
     static char key;
@@ -57,7 +57,8 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         plotPointSize = units / 6;
         xOffset = width / 2;
         yOffset = height / 2;
-        
+        graphLineFrequency = (double)0.4/units;
+
         // Draw Grid
         g.setColor(new Color(0, 0, 0, 120));
 
@@ -137,10 +138,14 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
     }
 
     public static void plotPoint(Graphics g, double x, double fx) {
+        if (convertToGraphUnitsY(fx) + yCenterOffset > height || convertToGraphUnitsY(fx) + yCenterOffset < 0) return; // Not in render range
+
         g.fillRect(convertToGraphUnitsX(x) + xCenterOffset - plotPointSize/2, convertToGraphUnitsY(fx) + yCenterOffset - plotPointSize/2, plotPointSize, plotPointSize);
     }
 
     public static void plotLines(Graphics g, double x, double fx, double fXGraphlinefreq) {
+        if (convertToGraphUnitsY(fx) + yCenterOffset > height || convertToGraphUnitsY(fx) + yCenterOffset < 0) return; // Not in render range
+
         g.drawLine(convertToGraphUnitsX(x) + xCenterOffset, convertToGraphUnitsY(fx) + yCenterOffset, convertToGraphUnitsX(x + graphLineFrequency) + xCenterOffset, convertToGraphUnitsY(fXGraphlinefreq) + yCenterOffset);
     }
     public static void drawCurrentMouseCoordLabel(Graphics g) {
@@ -171,7 +176,7 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
             yCenterOffset = 0;
             units += 1;
         }
-        if (key == '-' && units >= 6) {
+        if (key == '-' && units > 5) { // Gets very laggy if you go below 5 pixels/unit
             xCenterOffset = 0;
             yCenterOffset = 0;
             units -= 1;
