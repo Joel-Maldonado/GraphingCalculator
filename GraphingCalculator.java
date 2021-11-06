@@ -34,7 +34,7 @@ import javax.swing.SwingUtilities;
 public class GraphingCalculator extends JComponent implements KeyListener, MouseMotionListener {
     static int height = 800;
     static int width = 800;
-    static int units = Math.round(width / 20.5f);
+    static int units = (int) Math.round(width / 21);
     static int yCenterOffsetMultipler = 0;
     static int xCenterOffsetMultipler = 0;
     static int xOffset;
@@ -64,6 +64,7 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         width = getWidth();
         height = getHeight();
 
+        // units = (int) Math.round(width / unitsMultiplier);
         plotPointSize = units / 6;
         xOffset = Math.round(width / 2f);
         yOffset = Math.round(height / 2f);
@@ -106,7 +107,7 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
             if (answer + xCenterOffset / units == 0)
                 continue;
 
-            g.drawString("" + -(answer + xCenterOffset / units), xOffset + -answer * units, yOffset + yCenterOffset);
+            g.drawString("" + -(answer + xCenterOffset / units), xOffset + -answer * units - Math.round(units / 6f), yOffset + yCenterOffset);
         }
 
         // Vertical coord labels
