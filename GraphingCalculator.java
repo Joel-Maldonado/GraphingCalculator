@@ -1,16 +1,29 @@
+/*
+
+--Keys--
+Zoom out: -
+Zoom in: +
+
+Move Up: w
+Move Down: s
+Move Left: a
+Move Right: d
+
+*/
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class GraphingCalculator extends JComponent implements KeyListener {
+    static final double graphLineFrequency = 0.01; // 0.01 = 100 lines between each point
     static int height = 800;
     static int width = 800;
-    static int units = 25;
+    static int units = Math.round(width/20f);
     static int plotPointSize;
-    static char key;
     static int xCenterOffset;
     static int yCenterOffset;
-    static double graphLineFrequency = 0.01; // 0.01 = 100 lines per point
+    static char key;
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("Graphing Calculator");
@@ -55,31 +68,34 @@ public class GraphingCalculator extends JComponent implements KeyListener {
 
         // Draw coord labels
         g.setColor(Color.black);
-        g.setFont(g.getFont().deriveFont(units/2.2f));
+        g.setFont(g.getFont().deriveFont(units/2f));
 
         // Horizontal coord labels
-        for (int x = -xOffset; x <= xOffset; x += units) {
-            // Vertical line will have 0th value to stop overlap
-            if (Math.round((double) (x - xCenterOffset)/units) == 0) continue;
-            System.out.println(units);
-            g.drawString("" + Math.round((double)(x - xCenterOffset)/ units), x + xOffset, yOffset + yCenterOffset); 
+        for (int x = -xOffset - xCenterOffset - units; x <= xOffset - xCenterOffset + units; x += units) {
+            int answer = (int)Math.round((double)(x + xCenterOffset)/units);
+            
+            // Don't plot 0th coord. Vertical line will have the 0th value to stop overlap.
+            if (answer + xCenterOffset/units == 0) continue;
+
+            g.drawString("" + -(answer + xCenterOffset/units), xOffset + -answer * units, yOffset + yCenterOffset); 
         }
 
         // Vertical coord labels
-        for (int y = -yOffset; y < height; y += units) {
-            g.drawString("" + Math.round(-(double)(y - yCenterOffset)/ units), xOffset + xCenterOffset, y + yOffset - units/3);
+        for (int y = -yOffset - yCenterOffset - units; y < height/2 - yCenterOffset + units; y += units) {
+            int answer = -(int)Math.round((double)(y + yCenterOffset)/units);
+            g.drawString("" + (answer + yCenterOffset/units), xOffset + xCenterOffset, yOffset + -answer * units);
         }
         
         // Plot points
-        for (int x = -xOffset; x <= xOffset; x++) {
+        for (int x = -xOffset - units; x <= xOffset + units; x++) {
             g.setColor(Color.blue);
             plotPoint(g, x, f(x));
 
             g.setColor(Color.red);
-            plotPoint(g, x, h(x));
-
-            g.setColor(Color.green);
             plotPoint(g, x, g(x));
+            
+            g.setColor(Color.green);
+            plotPoint(g, x, h(x));
         }
 
         // Draw graph lines
@@ -88,10 +104,10 @@ public class GraphingCalculator extends JComponent implements KeyListener {
             plotLines(g, x, f(x), f(x+graphLineFrequency));
 
             g.setColor(Color.red);
-            plotLines(g, x, h(x), h(x+graphLineFrequency));
-
-            g.setColor(Color.green);
             plotLines(g, x, g(x), g(x+graphLineFrequency));
+            
+            g.setColor(Color.green);
+            plotLines(g, x, h(x), h(x+graphLineFrequency));
         }
     }
 
@@ -112,15 +128,15 @@ public class GraphingCalculator extends JComponent implements KeyListener {
     }
 
     public static double f(double x) {
-        return 5;
-    }
-
-    public static double h(double x) {
-        return x * 0.5 - 5;
+        return x; // y = x
     }
 
     public static double g(double x) {
-        return (x * x) + (2 * x) - 3;
+        return -x * 0.5 - 2; // Linear Function
+    }
+
+    public static double h(double x) {
+        return (x * x) - (3 * x) - 5; // Quadratic Function
     }
 
     public void keyPressed(KeyEvent e) { }
@@ -128,23 +144,19 @@ public class GraphingCalculator extends JComponent implements KeyListener {
     public void keyTyped(KeyEvent e) {
         key = e.getKeyChar();
         if (key == '+') {
-            units += 4;
             xCenterOffset = 0;
             yCenterOffset = 0;
-            System.out.println("Zoom in");
+            units += 1;
         }
         if (key == '-' && units >= 6) {
-            units -= 4;
             xCenterOffset = 0;
             yCenterOffset = 0;
-            System.out.println("Zoom out");
+            units -= 1;
         }
         if (key == 'd') {
-            System.out.println("right");
             xCenterOffset -= units;
         }
         if (key == 'a') {
-            System.out.println("left");
             xCenterOffset += units;
         }
         if (key == 'w') {
