@@ -47,7 +47,7 @@ public class GraphingCalculator extends JComponent implements KeyListener {
         int yOffset = height / 2;
         
         // Draw Grid
-        g.setColor(Color.black);
+        g.setColor(new Color(0, 0, 0, 120));
 
         // Dark Center lines
         g.drawLine(0, yOffset + yCenterOffset, width, yOffset + yCenterOffset); // Horizontal black center line
@@ -68,7 +68,7 @@ public class GraphingCalculator extends JComponent implements KeyListener {
 
         // Draw coord labels
         g.setColor(Color.black);
-        g.setFont(g.getFont().deriveFont(units/2f));
+        g.setFont(g.getFont().deriveFont(units/1.9f));
 
         // Horizontal coord labels
         for (int x = -xOffset - xCenterOffset - units; x <= xOffset - xCenterOffset + units; x += units) {
