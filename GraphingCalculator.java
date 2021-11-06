@@ -35,17 +35,19 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
     static int height = 800;
     static int width = 800;
     static int units = Math.round(width / 20.5f);
-    static double graphLineFrequency = (double) 0.4 / units; // 0-1 percentage split for # of lines between each point
+    static int yCenterOffsetMultipler = 0;
+    static int xCenterOffsetMultipler = 0;
     static int xOffset;
     static int yOffset;
     static int plotPointSize;
     static int xCenterOffset;
     static int yCenterOffset;
+    static double graphLineFrequency;
     static double mousePosX;
     static double mousePosY;
     static char key;
 
-    public static void main(final String[] args) {
+    public static void main(String[] args) {
         final JFrame frame = new JFrame("Graphing Calculator");
         final GraphingCalculator shapes = new GraphingCalculator();
 
@@ -58,7 +60,7 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         frame.setVisible(true);
     }
 
-    public void paint(final Graphics g) {
+    public void paint(Graphics g) {
         width = getWidth();
         height = getHeight();
 
@@ -66,6 +68,8 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         xOffset = Math.round(width / 2f);
         yOffset = Math.round(height / 2f);
         graphLineFrequency = (double) 0.4 / units; // More accurate if zoomed in, less accurate when zoomed out
+        xCenterOffset = units * xCenterOffsetMultipler;
+        yCenterOffset = units * yCenterOffsetMultipler;
 
         // Draw Grid
         g.setColor(new Color(0, 0, 0, 120));
@@ -78,23 +82,25 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         g.setColor(new Color(0, 0, 0, 30));
 
         // Vertical gray lines
-        for (int x = -xOffset; convertToGraphUnitsX(x) < width; x++) {
-            g.drawLine(x * units + xOffset, 0, x * units + xOffset, height);
-            g.drawLine(x * units + xOffset, 0, x * units + xOffset, height);
+        for (int x = 0; x <= width / 2; x += units) {
+            g.drawLine(x + xOffset + units, 0, x + xOffset + units, height);
+            g.drawLine(-x + xOffset, 0, -x + xOffset, height);
         }
 
         // Horizontal gray lines
-        for (int y = -yOffset; convertToGraphUnitsY(-y) < height; y++) {
-            g.drawLine(0, convertToGraphUnitsY(y), width, convertToGraphUnitsY(y));
+        for (int y = 0; y < height / 2; y += units) {
+            g.drawLine(0, y + units + yOffset, width, y + units + yOffset);
+            g.drawLine(0, -y + yOffset, width, -y + yOffset);
         }
 
         // Draw coord labels
         g.setColor(Color.black);
         g.setFont(g.getFont().deriveFont(units / 2.2f));
 
+        int answer;
         // Horizontal coord labels
         for (int x = -xOffset - xCenterOffset - units; x <= xOffset - xCenterOffset + units; x += units) {
-            final int answer = (int) Math.round((double) (x + xCenterOffset) / units);
+            answer = (int) Math.round((double) (x + xCenterOffset) / units);
 
             // Don't plot 0th coord. Vertical line will have the 0th value to stop overlap.
             if (answer + xCenterOffset / units == 0)
@@ -105,7 +111,7 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
 
         // Vertical coord labels
         for (int y = -yOffset - yCenterOffset - units; y < height / 2 - yCenterOffset + units; y += units) {
-            final int answer = -(int) Math.round((double) (y + yCenterOffset) / units);
+            answer = -(int) Math.round((double) (y + yCenterOffset) / units);
             g.drawString("" + (answer + yCenterOffset / units), xOffset + xCenterOffset, yOffset + -answer * units);
         }
 
@@ -188,26 +194,22 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
     public void keyTyped(KeyEvent e) {
         key = e.getKeyChar();
         if (key == '+') {
-            xCenterOffset = 0;
-            yCenterOffset = 0;
             units += 1;
         }
         if (key == '-' && units > 5) { // Gets very laggy if you go below 5 pixels/unit
-            xCenterOffset = 0;
-            yCenterOffset = 0;
             units -= 1;
         }
         if (key == 'd') {
-            xCenterOffset -= units;
+            xCenterOffsetMultipler--;
         }
         if (key == 'a') {
-            xCenterOffset += units;
+            xCenterOffsetMultipler++;
         }
         if (key == 'w') {
-            yCenterOffset += units;
+            yCenterOffsetMultipler++;
         }
         if (key == 's') {
-            yCenterOffset -= units;
+            yCenterOffsetMultipler--;
         }
         repaint();
     }
