@@ -1,5 +1,13 @@
 /*
 
+--Features--
+Graphing lines
+Coordinate labels
+Coordinate plane
+Zooming in and out
+Moving the graph
+Mouse hovering label
+
 --Keys--
 Zoom out: -
 Zoom in: +
@@ -15,14 +23,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class GraphingCalculator extends JComponent implements KeyListener {
+public class GraphingCalculator extends JComponent implements KeyListener, MouseMotionListener {
     static final double graphLineFrequency = 0.01; // 0.01 = 100 lines between each point
     static int height = 800;
     static int width = 800;
-    static int units = Math.round(width/20f);
+    static int units = Math.round(width/20.5f);
+    static int xOffset;
+    static int yOffset;
     static int plotPointSize;
     static int xCenterOffset;
     static int yCenterOffset;
+    static int mousePosX;
+    static int mousePosY;
     static char key;
 
     public static void main(String[] args) {
@@ -34,6 +46,7 @@ public class GraphingCalculator extends JComponent implements KeyListener {
         frame.setLocationRelativeTo(null);
         frame.add(shapes);
         frame.addKeyListener(shapes);
+        frame.addMouseMotionListener(shapes);
         frame.setVisible(true);
     }
 
@@ -42,9 +55,8 @@ public class GraphingCalculator extends JComponent implements KeyListener {
         height = getHeight();
 
         plotPointSize = units / 6;
-        
-        int xOffset = width / 2;
-        int yOffset = height / 2;
+        xOffset = width / 2;
+        yOffset = height / 2;
         
         // Draw Grid
         g.setColor(new Color(0, 0, 0, 120));
@@ -109,6 +121,11 @@ public class GraphingCalculator extends JComponent implements KeyListener {
             g.setColor(Color.green);
             plotLines(g, x, h(x), h(x+graphLineFrequency));
         }
+
+        // Mouse coord label
+        g.setFont(g.getFont().deriveFont(25f));
+        g.setColor(Color.black);
+        drawCurrentMouseCoordLabel(g);
     }
 
     public static int convertToGraphUnitsX(double xCoord) {
@@ -126,13 +143,19 @@ public class GraphingCalculator extends JComponent implements KeyListener {
     public static void plotLines(Graphics g, double x, double fx, double fXGraphlinefreq) {
         g.drawLine(convertToGraphUnitsX(x) + xCenterOffset, convertToGraphUnitsY(fx) + yCenterOffset, convertToGraphUnitsX(x + graphLineFrequency) + xCenterOffset, convertToGraphUnitsY(fXGraphlinefreq) + yCenterOffset);
     }
+    public static void drawCurrentMouseCoordLabel(Graphics g) {
+        double x = mousePosX - xCenterOffset - xOffset - units/4;
+        double y = mousePosY - yCenterOffset - yOffset + units/4 - units;
+
+        g.drawString("(X: " + Math.round(x / units) + " Y: " + Math.round(-y / units) + ")", 5, 25);
+    }
 
     public static double f(double x) {
         return x; // y = x
     }
 
     public static double g(double x) {
-        return -x * 0.5 - 2; // Linear Function
+        return x/3 - 7; // Linear Function
     }
 
     public static double h(double x) {
@@ -165,6 +188,13 @@ public class GraphingCalculator extends JComponent implements KeyListener {
         if (key == 's') {
             yCenterOffset -= units;
         }
+        repaint();
+    }
+
+    public void mouseDragged(MouseEvent e) {}
+    public void mouseMoved(MouseEvent e) {
+        mousePosX = e.getX();
+        mousePosY = e.getY();
         repaint();
     }
 }
