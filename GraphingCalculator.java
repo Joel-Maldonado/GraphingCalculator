@@ -1,13 +1,5 @@
 /*
 
---Features--
-Graphing lines
-Coordinate labels
-Coordinate plane
-Zooming in and out
-Moving the graph
-Mouse hovering label
-
 --Keys--
 Zoom out: -
 Zoom in: +
@@ -17,6 +9,10 @@ Move Down: s
 Move Left: a
 Move Right: d
 
+Dark theme: t
+Reset Center Offset & Zoom: r
+
+--Keys--
 */
 
 import java.awt.Color;
@@ -32,6 +28,8 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 public class GraphingCalculator extends JComponent implements KeyListener, MouseMotionListener {
+    static JFrame frame;
+    static boolean darkTheme = false;
     static int height = 800;
     static int width = 800;
     static int units = (int) Math.round(width / 21);
@@ -48,7 +46,7 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
     static char key;
 
     public static void main(String[] args) {
-        final JFrame frame = new JFrame("Graphing Calculator");
+        frame = new JFrame("Graphing Calculator");
         final GraphingCalculator shapes = new GraphingCalculator();
 
         frame.setSize(width, height);
@@ -64,7 +62,6 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         width = getWidth();
         height = getHeight();
 
-        // units = (int) Math.round(width / unitsMultiplier);
         plotPointSize = units / 6;
         xOffset = Math.round(width / 2f);
         yOffset = Math.round(height / 2f);
@@ -73,14 +70,19 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         yCenterOffset = units * yCenterOffsetMultipler;
 
         // Draw Grid
-        g.setColor(new Color(0, 0, 0, 120));
+        if (darkTheme)
+            g.setColor(new Color(255, 255, 255, 120));
+        else
+            g.setColor(new Color(0, 0, 0, 120));
 
-        // Dark Center lines
         g.drawLine(0, yOffset + yCenterOffset, width, yOffset + yCenterOffset); // Horizontal black center line
         g.drawLine(xOffset + xCenterOffset, 0, xOffset + xCenterOffset, height); // Vertical black center line
 
         // Rest of grid
-        g.setColor(new Color(0, 0, 0, 30));
+        if (darkTheme)
+            g.setColor(new Color(255, 255, 255, 30));
+        else
+            g.setColor(new Color(0, 0, 0, 30));
 
         // Vertical gray lines
         for (int x = 0; x <= width / 2; x += units) {
@@ -92,28 +94,6 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         for (int y = 0; y < height / 2; y += units) {
             g.drawLine(0, y + units + yOffset, width, y + units + yOffset);
             g.drawLine(0, -y + yOffset, width, -y + yOffset);
-        }
-
-        // Draw coord labels
-        g.setColor(Color.black);
-        g.setFont(g.getFont().deriveFont(units / 2.2f));
-
-        int answer;
-        // Horizontal coord labels
-        for (int x = -xOffset - xCenterOffset - units; x <= xOffset - xCenterOffset + units; x += units) {
-            answer = (int) Math.round((double) (x + xCenterOffset) / units);
-
-            // Don't plot 0th coord. Vertical line will have the 0th value to stop overlap.
-            if (answer + xCenterOffset / units == 0)
-                continue;
-
-            g.drawString("" + -(answer + xCenterOffset / units), xOffset + -answer * units - Math.round(units / 6f), yOffset + yCenterOffset);
-        }
-
-        // Vertical coord labels
-        for (int y = -yOffset - yCenterOffset - units; y < height / 2 - yCenterOffset + units; y += units) {
-            answer = -(int) Math.round((double) (y + yCenterOffset) / units);
-            g.drawString("" + (answer + yCenterOffset / units), xOffset + xCenterOffset, yOffset + -answer * units);
         }
 
         // Plot points
@@ -140,9 +120,39 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
             plotLines(g, x, h(x), h(x + graphLineFrequency));
         }
 
+        // Draw coord labels
+        if (darkTheme)
+            g.setColor(Color.white);
+        else
+            g.setColor(Color.black);
+
+        g.setFont(g.getFont().deriveFont(units / 2.2f));
+
+        int answer;
+        // Horizontal coord labels
+        for (int x = -xOffset - xCenterOffset - units; x <= xOffset - xCenterOffset + units; x += units) {
+            answer = (int) Math.round((double) (x + xCenterOffset) / units);
+
+            // Don't plot 0th coord. Vertical line will have the 0th value to stop overlap.
+            if (answer + xCenterOffset / units == 0)
+                continue;
+
+            g.drawString("" + -(answer + xCenterOffset / units), xOffset + -answer * units - Math.round(units / 6f),
+                    yOffset + yCenterOffset);
+        }
+
+        // Vertical coord labels
+        for (int y = -yOffset - yCenterOffset - units; y < height / 2 - yCenterOffset + units; y += units) {
+            answer = -(int) Math.round((double) (y + yCenterOffset) / units);
+            g.drawString("" + (answer + yCenterOffset / units), xOffset + xCenterOffset, yOffset + -answer * units);
+        }
+
         // Mouse coord label
         g.setFont(g.getFont().deriveFont(25f));
-        g.setColor(Color.black);
+        if (darkTheme)
+            g.setColor(Color.white);
+        else
+            g.setColor(Color.black);
         drawCurrentMouseCoordLabel(g);
     }
 
@@ -178,6 +188,16 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         g.drawString("(X: " + Math.round(x / units) + " Y: " + Math.round(-y / units) + ")", 5, 25);
     }
 
+    public static void switchTheme(boolean darkTheme) {
+        if (darkTheme) {
+            System.out.println("Dark Theme");
+            frame.getContentPane().setBackground(Color.black);
+        } else {
+            System.out.println("Light Theme");
+            frame.getContentPane().setBackground(Color.white);
+        }
+    }
+
     public static double f(double x) {
         return x; // y = x
     }
@@ -211,6 +231,15 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         }
         if (key == 's') {
             yCenterOffsetMultipler--;
+        }
+        if (key == 't') {
+            darkTheme = !darkTheme;
+            switchTheme(darkTheme);
+        }
+        if (key == 'r') {
+            yCenterOffsetMultipler = 0;
+            xCenterOffsetMultipler = 0;
+            units = (int) Math.round(800 / 21);
         }
         repaint();
     }

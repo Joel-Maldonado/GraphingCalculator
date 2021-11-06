@@ -18,6 +18,8 @@ A Graphing calculator made with Java Swing
 - Move Left: a
 - Move Right: d
 
+- Dark theme: t
+- Reset Center Offset & Zoom: r
 # 
 Note: I just started learning Java, so the code might suck.
 # 
