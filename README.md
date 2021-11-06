@@ -20,6 +20,7 @@ A Graphing calculator made with Java Swing
 
 - Dark theme: t
 - Reset Center Offset & Zoom: r
+- Hide Mouse Hover Coords: h
 # 
 Note: I just started learning Java, so the code might suck.
 # 

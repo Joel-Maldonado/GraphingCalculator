@@ -1,6 +1,6 @@
 /*
-
 --Keys--
+
 Zoom out: -
 Zoom in: +
 
@@ -11,6 +11,7 @@ Move Right: d
 
 Dark theme: t
 Reset Center Offset & Zoom: r
+Hide Mouse Hover Coords: h
 
 --Keys--
 */
@@ -30,6 +31,7 @@ import javax.swing.SwingUtilities;
 public class GraphingCalculator extends JComponent implements KeyListener, MouseMotionListener {
     static JFrame frame;
     static boolean darkTheme = false;
+    static boolean showHoverCoords = true;
     static int height = 800;
     static int width = 800;
     static int units = (int) Math.round(width / 21);
@@ -148,12 +150,14 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         }
 
         // Mouse coord label
-        g.setFont(g.getFont().deriveFont(25f));
-        if (darkTheme)
-            g.setColor(Color.white);
-        else
-            g.setColor(Color.black);
-        drawCurrentMouseCoordLabel(g);
+        if (showHoverCoords) {
+            g.setFont(g.getFont().deriveFont(25f));
+            if (darkTheme)
+                g.setColor(Color.white);
+            else
+                g.setColor(Color.black);
+            drawCurrentMouseCoordLabel(g);
+        }
     }
 
     public static int convertToGraphUnitsX(double xCoord) {
@@ -190,10 +194,8 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
 
     public static void switchTheme(boolean darkTheme) {
         if (darkTheme) {
-            System.out.println("Dark Theme");
             frame.getContentPane().setBackground(Color.black);
         } else {
-            System.out.println("Light Theme");
             frame.getContentPane().setBackground(Color.white);
         }
     }
@@ -240,6 +242,9 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
             yCenterOffsetMultipler = 0;
             xCenterOffsetMultipler = 0;
             units = (int) Math.round(800 / 21);
+        }
+        if (key == 'h') {
+            showHoverCoords = !showHoverCoords;
         }
         repaint();
     }
