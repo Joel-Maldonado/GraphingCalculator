@@ -1,22 +1,22 @@
 /*
 --Keys--
 
-Zoom out: -
-Zoom in: +
+Zoom out: (-)
+Zoom in: (+)
 
-Move Up by 1: w
-Move Down by 1: s
-Move Left by 1: a
-Move Right by 1: d
+Move Up by 1: (w)
+Move Down by 1: (s)
+Move Left by 1: (a)
+Move Right by 1: (d)
 
-Move Up by 5: shift + w
-Move Down by 5: shift + s
-Move Left by 5: shift + a
-Move Right by 5: shift + d
+Move Up by 5: (shift + w)
+Move Down by 5: (shift + s)
+Move Left by 5: (shift + a)
+Move Right by 5: (shift + d)
 
-Dark theme: t
-Reset Center Offset & Zoom: r
-Hide Mouse Hover Coords: h
+Dark theme: (t)
+Reset Center Offset & Zoom: (r)
+Hide Mouse Hover Coords: (h)
 
 --Keys--
 */
@@ -221,48 +221,55 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
     public void keyReleased(KeyEvent e) {}
     public void keyTyped(KeyEvent e) {
         key = e.getKeyChar();
+        // Zooming
         if (key == '+') {
             units += 1;
         }
         if (key == '-' && units > 5) { // Gets very laggy if you go below 5 pixels/unit
             units -= 1;
         }
-        if (key == 'd') {
-            xCenterOffsetMultipler--;
-        }
-        if (key == 'D') { // Holding shift
-            xCenterOffsetMultipler -= 5;
+        // Movement
+        if (key == 'w') {
+            yCenterOffsetMultipler++;
         }
         if (key == 'a') {
             xCenterOffsetMultipler++;
         }
-        if (key == 'A') {
-            xCenterOffsetMultipler += 5;
+        if (key == 's') {
+            yCenterOffsetMultipler--;
         }
-        if (key == 'w') {
-            yCenterOffsetMultipler++;
+        if (key == 'd') {
+            xCenterOffsetMultipler--;
         }
+        // Holding shift
         if (key == 'W') {
             yCenterOffsetMultipler += 5;
         }
-        if (key == 's') {
-            yCenterOffsetMultipler--;
+        if (key == 'A') {
+            xCenterOffsetMultipler += 5;
         }
         if (key == 'S') {
             yCenterOffsetMultipler -= 5;
         }
+        if (key == 'D') { // Holding shift
+            xCenterOffsetMultipler -= 5;
+        }
+        // Dark Theme
         if (key == 't') {
             darkTheme = !darkTheme;
             switchTheme(darkTheme);
         }
+        // Reset zoom / center offset
         if (key == 'r') {
             yCenterOffsetMultipler = 0;
             xCenterOffsetMultipler = 0;
             units = (int) Math.round(800 / 21);
         }
+        // Hide hover coords
         if (key == 'h') {
             showHoverCoords = !showHoverCoords;
         }
+        
         repaint();
     }
 
