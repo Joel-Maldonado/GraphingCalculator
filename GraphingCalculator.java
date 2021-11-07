@@ -220,8 +220,6 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
     public void keyTyped(KeyEvent e) {
-        System.out.println("You pressed: " + e.getKeyCode());
-
         key = e.getKeyChar();
         if (key == '+') {
             units += 1;
