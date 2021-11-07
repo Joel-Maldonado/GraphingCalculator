@@ -4,10 +4,15 @@
 Zoom out: -
 Zoom in: +
 
-Move Up: w
-Move Down: s
-Move Left: a
-Move Right: d
+Move Up by 1: w
+Move Down by 1: s
+Move Left by 1: a
+Move Right by 1: d
+
+Move Up by 5: shift + w
+Move Down by 5: shift + s
+Move Left by 5: shift + a
+Move Right by 5: shift + d
 
 Dark theme: t
 Reset Center Offset & Zoom: r
@@ -215,6 +220,8 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
     public void keyTyped(KeyEvent e) {
+        System.out.println("You pressed: " + e.getKeyCode());
+
         key = e.getKeyChar();
         if (key == '+') {
             units += 1;
@@ -225,14 +232,26 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         if (key == 'd') {
             xCenterOffsetMultipler--;
         }
+        if (key == 'D') { // Holding shift
+            xCenterOffsetMultipler -= 5;
+        }
         if (key == 'a') {
             xCenterOffsetMultipler++;
+        }
+        if (key == 'A') {
+            xCenterOffsetMultipler += 5;
         }
         if (key == 'w') {
             yCenterOffsetMultipler++;
         }
+        if (key == 'W') {
+            yCenterOffsetMultipler += 5;
+        }
         if (key == 's') {
             yCenterOffsetMultipler--;
+        }
+        if (key == 'S') {
+            yCenterOffsetMultipler -= 5;
         }
         if (key == 't') {
             darkTheme = !darkTheme;
