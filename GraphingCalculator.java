@@ -50,7 +50,6 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
     static double graphLineFrequency;
     static double mousePosX;
     static double mousePosY;
-    static char key;
 
     public static void main(String[] args) {
         frame = new JFrame("Graphing Calculator");
@@ -165,15 +164,15 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
         }
     }
 
-    public static int convertToGraphUnitsX(double xCoord) {
+    private static int convertToGraphUnitsX(double xCoord) {
         return (int) (Math.round(xCoord * units + width / 2.0));
     }
 
-    public static int convertToGraphUnitsY(double yCoord) {
+    private static int convertToGraphUnitsY(double yCoord) {
         return (int) (Math.round(-yCoord * units + height / 2.0));
     }
 
-    public static void plotPoint(Graphics g, double x, double fx) {
+    private static void plotPoint(Graphics g, double x, double fx) {
         if (convertToGraphUnitsY(fx) + yCenterOffset > height || convertToGraphUnitsY(fx) + yCenterOffset < 0)
             return; // Not in render range
 
@@ -181,7 +180,7 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
                 convertToGraphUnitsY(fx) + yCenterOffset - plotPointSize / 2, plotPointSize, plotPointSize);
     }
 
-    public static void plotLines(Graphics g, double x, double fx, double fXGraphlinefreq) {
+    private static void plotLines(Graphics g, double x, double fx, double fXGraphlinefreq) {
         if (convertToGraphUnitsY(fx) + yCenterOffset > height || convertToGraphUnitsY(fx) + yCenterOffset < 0)
             return; // Not in render range
 
@@ -190,86 +189,80 @@ public class GraphingCalculator extends JComponent implements KeyListener, Mouse
                 convertToGraphUnitsY(fXGraphlinefreq) + yCenterOffset);
     }
 
-    public static void drawCurrentMouseCoordLabel(Graphics g) {
+    private static void drawCurrentMouseCoordLabel(Graphics g) {
         final double x = mousePosX - xCenterOffset - xOffset;
         final double y = mousePosY - yCenterOffset - yOffset;
 
         g.drawString("(X: " + Math.round(x / units) + " Y: " + Math.round(-y / units) + ")", 5, 25);
     }
 
-    public static void switchTheme(boolean darkTheme) {
+    private static void switchTheme() {
+        darkTheme = !darkTheme;
         if (darkTheme) {
             frame.getContentPane().setBackground(Color.black);
         } else {
-            frame.getContentPane().setBackground(Color.white);
+            frame.getContentPane().setBackground(new Color(238, 238, 238)); // Default background color
         }
     }
 
-    public static double f(double x) {
+    private static double f(double x) {
         return x; // y = x
     }
 
-    public static double g(double x) {
+    private static double g(double x) {
         return x / 3 - 7; // Linear Function
     }
 
-    public static double h(double x) {
+    private static double h(double x) {
         return (x * x) - (3 * x) - 5; // Quadratic Function
     }
 
     public void keyPressed(KeyEvent e) {}
     public void keyReleased(KeyEvent e) {}
     public void keyTyped(KeyEvent e) {
-        key = e.getKeyChar();
-        // Zooming
-        if (key == '+') {
-            units += 1;
+        switch(e.getKeyChar()) {
+            case '+': // Zooming
+                units += 1;
+                break;
+            case '-':
+                units -= 1;
+                break;
+            case 'w': // Movement
+                yCenterOffsetMultipler++;
+                break;
+            case 'a':
+                xCenterOffsetMultipler++;
+                break;
+            case 's':
+                yCenterOffsetMultipler--;
+                break;
+            case 'd':
+                xCenterOffsetMultipler--;
+                break;
+            case 'W': // Holding shift
+                yCenterOffsetMultipler += 5;
+                break;
+            case 'A':
+                xCenterOffsetMultipler += 5;
+                break;
+            case 'S':
+                yCenterOffsetMultipler -= 5;
+                break;
+            case 'D':
+                xCenterOffsetMultipler -= 5;
+                break;
+            case 't': // Dark Theme
+                switchTheme();
+                break;
+            case 'r': // Reset zoom / center offset
+                yCenterOffsetMultipler = 0;
+                xCenterOffsetMultipler = 0;
+                units = (int) Math.round(800 / 21f);
+                break;
+            case 'h': // Hide hover coords
+                showHoverCoords = !showHoverCoords;
+                break;
         }
-        if (key == '-' && units > 5) { // Gets very laggy if you go below 5 pixels/unit
-            units -= 1;
-        }
-        // Movement
-        if (key == 'w') {
-            yCenterOffsetMultipler++;
-        }
-        if (key == 'a') {
-            xCenterOffsetMultipler++;
-        }
-        if (key == 's') {
-            yCenterOffsetMultipler--;
-        }
-        if (key == 'd') {
-            xCenterOffsetMultipler--;
-        }
-        // Holding shift
-        if (key == 'W') {
-            yCenterOffsetMultipler += 5;
-        }
-        if (key == 'A') {
-            xCenterOffsetMultipler += 5;
-        }
-        if (key == 'S') {
-            yCenterOffsetMultipler -= 5;
-        }
-        if (key == 'D') { // Holding shift
-            xCenterOffsetMultipler -= 5;
-        }
-        // Dark Theme
-        if (key == 't') {
-            darkTheme = !darkTheme;
-            switchTheme(darkTheme);
-        }
-        // Reset zoom / center offset
-        if (key == 'r') {
-            yCenterOffsetMultipler = 0;
-            xCenterOffsetMultipler = 0;
-            units = (int) Math.round(800 / 21);
-        }
-        // Hide hover coords
-        if (key == 'h') {
-            showHoverCoords = !showHoverCoords;
-        }
-        
         repaint();
     }
 
